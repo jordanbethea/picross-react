@@ -10,8 +10,8 @@
 }
 
 .selected{
-    color:black;
+    background-color:black;
 }
 .unselected{
-    color:white;
+    background-color:white;
 }

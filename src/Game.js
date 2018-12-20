@@ -8,27 +8,40 @@ class Game extends Component {
         this.newGame = this.newGame.bind(this);
         this.widthInput = this.widthInput.bind(this);
         this.heightInput = this.heightInput.bind(this);
+        this.clickSquare = this.clickSquare.bind(this);
         this.state = {
             width:3,
             height:3,
             formWidth:0,
-            formHeight:0
+            formHeight:0,
+            squares: this.generateGrid(3,3)
         }
     }
     componentDidMount(){
-        this.generateGrid(this.state.width, this.state.height);
+        var squares = this.generateGrid(this.state.width, this.state.height);
+        this.setState({squares: squares});
     }
     newGame(event){
+        var squares = this.generateGrid(this.state.formWidth, this.state.formHeight);
         this.setState({
             width: this.state.formWidth,
             height: this.state.formHeight,
             formWidth:0,
-            formHeight:0
+            formHeight:0,
+            squares: squares
         })
-        this.generateGrid(this.state.width, this.state.height);
     }
     widthInput(event){this.setState({formWidth:parseInt(event.target.value)})}
     heightInput(event){this.setState({formHeight:parseInt(event.target.value)})}
+    clickSquare(i){
+        var localState = this.state;
+        for(var prop in this){
+            console.log(prop);
+        }
+        var squares = this.state.squares.slice();
+        squares[i].selected = !squares[i].selected;
+        this.setState({squares: squares});
+    }
 
     render(){
         return <div className="Game">
@@ -42,7 +55,8 @@ class Game extends Component {
                     onChange={this.heightInput}></input>
                 
             </header>
-            <Gameboard width={this.state.width} height={this.state.height}/>
+            <Gameboard width={this.state.width} height={this.state.height} 
+                squares={this.state.squares} clickSquare={this.clickSquare}/>
         </div>
     }
 
@@ -71,7 +85,9 @@ const Gameboard = function(props){
         var endInt = startInt + props.width;
         rows.push(Row({
             start: startInt,
-            end: endInt
+            end: endInt,
+            squares: props.squares,
+            clickSquare: props.clickSquare
         }))
     }
     return <div className="boardContainer">{rows}</div>;
@@ -80,7 +96,10 @@ const Gameboard = function(props){
 const Row = function(props){
     var rowSquares = [];
     for(var i=props.start;i<props.end;i++){
-        rowSquares.push(Square({id:i}));
+        rowSquares.push(Square({id:i, 
+                isSelected:props.squares[i].selected,
+            clickSquare: props.clickSquare
+        }));
     }
     return <div key={props.start} className="row">{rowSquares}</div>;
 }
@@ -88,8 +107,10 @@ const Row = function(props){
 
 
 const Square = function(props){
-    let visClass = props.isSelected ? "unselected":"selected";
-    return <button key={props.id} className="Square ${visClass}"></button>;
+    var visClass = props.isSelected ? "selected":"unselected";
+    var classes = 'Square '+visClass;
+    return <button key={props.id} className={classes}
+            onClick={()=>props.clickSquare(props.id)}></button>;
 }
 
 export default Game;
