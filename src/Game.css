@@ -1,6 +1,6 @@
 .boardContainer{
     margin-left:200px;
-    margin-top:100px;
+    
 }
 
 .Square {
@@ -8,10 +8,38 @@
     height:50px;
     border: solid 1px black;
 }
+.Square:focus{outline: 0}
 
 .selected{
     background-color:black;
 }
 .unselected{
     background-color:white;
+}
+.filled{
+    background-color:gray;
+}
+
+.clue {
+    display:inline-block;
+    text-align:center;
+}
+.clueGrid{
+    display:block;
+}
+
+.topGrid{
+    margin-left:200px;
+    margin-top: 50px;
+}
+.topGrid .clue{
+    width: 50px;
+    height: 10px;
+}
+.sideGrid{
+    margin-top:100px;
+}
+.sideGrid .clue{
+    width:10px;
+    height:50px;
 }

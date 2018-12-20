@@ -9,26 +9,33 @@ class Game extends Component {
         this.widthInput = this.widthInput.bind(this);
         this.heightInput = this.heightInput.bind(this);
         this.clickSquare = this.clickSquare.bind(this);
+        var squares = this.generateGrid(3,3);
         this.state = {
             width:3,
             height:3,
-            formWidth:0,
-            formHeight:0,
-            squares: this.generateGrid(3,3)
+            formWidth:0, //text field for new game width
+            formHeight:0, //and height
+            squares: squares,
+            maxColumnClues:2, //max number of clues per column
+            maxRowClues:2, //max number of clues per row,
+            topClues:this.generateTopClues(squares, 3, 3, 2),
+            sideClues:this.generateSideClues(squares,3,3, 2)
         }
-    }
-    componentDidMount(){
-        var squares = this.generateGrid(this.state.width, this.state.height);
-        this.setState({squares: squares});
     }
     newGame(event){
         var squares = this.generateGrid(this.state.formWidth, this.state.formHeight);
+        var maxColClues = this.maxCluesCounter(this.state.formHeight);
+        var maxRowClues = this.maxCluesCounter(this.state.formWidth);
         this.setState({
             width: this.state.formWidth,
             height: this.state.formHeight,
             formWidth:0,
             formHeight:0,
-            squares: squares
+            squares: squares,
+            maxColumnClues: maxColClues,
+            maxRowClues: maxRowClues,
+            topClues: this.generateTopClues(squares, this.state.formWidth, this.state.formHeight, maxColClues),
+            sideClues: this.generateSideClues(squares, this.state.formWidth, this.state.formHeight, maxRowClues)
         })
     }
     widthInput(event){this.setState({formWidth:parseInt(event.target.value)})}
@@ -55,16 +62,55 @@ class Game extends Component {
                     onChange={this.heightInput}></input>
                 
             </header>
+            <ClueGrid width={this.state.width} height={this.state.maxColumnClues}
+                gridPos="topGrid" clueVals={this.state.topClues} />
+            {/*<ClueGrid width={this.state.maxRowClues} height={this.state.height}
+                gridPos="sideGrid" clueVals={this.state.sideClues} /> */}
             <Gameboard width={this.state.width} height={this.state.height} 
                 squares={this.state.squares} clickSquare={this.clickSquare}/>
         </div>
+    }
+
+    maxCluesCounter(size){ return Math.round(size/2); }
+    generateTopClues(squares, gridWidth, gridHeight, cluesHeight){
+        var squareGridSize = gridWidth * gridHeight;
+        var cluesSize = gridWidth * cluesHeight;
+        var clueGrid = Array(cluesSize).fill(null);
+        for(var colNum = 0;colNum < gridWidth;colNum++){
+            var colVals = [];
+        //from input squares grid, create temp array of squares from single column
+            for(var i = colNum;i<squareGridSize;i+=gridHeight){
+                colVals.push(squares[i].filled);
+            }
+        //loop through column and push clue values to temp array
+            var colClues = [];
+            var counting = 0;
+            for(var i=0;i<colVals.length;i++){
+                var square = colVals[i];
+                if(square == true){counting++;}
+                if(square != true && counting > 0){colClues.push(counting); counting = 0;}
+            }
+            if(counting > 0){ colClues.push(counting);}
+        //add temp array values to clueGrid
+            var blankFillerCount = cluesHeight - colClues.length;
+            for(var i = 0;i<colClues.length;i++){
+                var clueCount = i + blankFillerCount;
+                var clueGridPos = colNum + (gridWidth * clueCount);
+                clueGrid[clueGridPos] = colClues[i];
+            }
+        }
+        return clueGrid;
+    }
+    generateSideClues(squares){
+
     }
 
     generateGrid(width=3,height=3){
         var total = width * height;
         var squares = Array(total).fill(null);
         for(var i =0;i<total;i++){
-            squares[i] = this.createSquareData(i);
+            var filled = Math.round(Math.random()) == 1;
+            squares[i] = this.createSquareData(i, filled);
         }
         return squares;
     }
@@ -78,6 +124,40 @@ class Game extends Component {
     }
 }
 
+/*
+    Components for top and side clues
+*/
+
+const ClueGrid = function(props){
+    var rows = [];
+    for(var i=0;i<props.height;i++){
+        var startClue = i * props.width;
+        var endClue = startClue + props.width;
+        rows.push(ClueRow({
+            start:startClue,
+            end: endClue,
+            clueVals: props.clueVals
+        }))
+    }
+    var clueClass = "clueGrid "+props.gridPos;
+    return <div className={clueClass}>{rows}</div>
+}
+
+const ClueRow = function(props){
+    var rowClues = [];
+    for(var i=props.start;i<props.end;i++){
+        rowClues.push(Clue({clueVal:props.clueVals[i]}));
+    }
+    return <div className="clueRow">{rowClues}</div>;
+}
+
+const Clue = function(props){
+    return <span className="clue">{props.clueVal}</span>;
+}
+
+/*
+    Components for gameboard and clickable squares
+*/
 const Gameboard = function(props){
     var rows = [];
     for(var i=0;i<props.height;i++){
@@ -97,17 +177,16 @@ const Row = function(props){
     var rowSquares = [];
     for(var i=props.start;i<props.end;i++){
         rowSquares.push(Square({id:i, 
-                isSelected:props.squares[i].selected,
+                square:props.squares[i],
             clickSquare: props.clickSquare
         }));
     }
     return <div key={props.start} className="row">{rowSquares}</div>;
 }
 
-
-
 const Square = function(props){
-    var visClass = props.isSelected ? "selected":"unselected";
+    var visClass = props.square.selected ? "selected":"unselected";
+    if(!props.square.selected && props.square.filled){visClass = "filled";}
     var classes = 'Square '+visClass;
     return <button key={props.id} className={classes}
             onClick={()=>props.clickSquare(props.id)}></button>;
