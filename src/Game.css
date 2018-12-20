@@ -1,5 +1,5 @@
 .boardContainer{
-    margin-left:200px;
+    display:inline-block;
     
 }
 
@@ -23,23 +23,32 @@
 .clue {
     display:inline-block;
     text-align:center;
+    vertical-align:middle;
 }
 .clueGrid{
-    display:block;
+    
+}
+.clueRow{
+    height:50px;
 }
 
 .topGrid{
     margin-left:200px;
     margin-top: 50px;
+    display:block;
 }
 .topGrid .clue{
     width: 50px;
     height: 10px;
 }
 .sideGrid{
-    margin-top:100px;
+    width:200px;
+    display:inline-block;
+}
+.sideGrid .clueRow{
+    text-align:right;
 }
 .sideGrid .clue{
-    width:10px;
+    width:20px;
     height:50px;
 }

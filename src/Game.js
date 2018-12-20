@@ -64,8 +64,8 @@ class Game extends Component {
             </header>
             <ClueGrid width={this.state.width} height={this.state.maxColumnClues}
                 gridPos="topGrid" clueVals={this.state.topClues} />
-            {/*<ClueGrid width={this.state.maxRowClues} height={this.state.height}
-                gridPos="sideGrid" clueVals={this.state.sideClues} /> */}
+            <ClueGrid width={this.state.maxRowClues} height={this.state.height}
+                gridPos="sideGrid" clueVals={this.state.sideClues} />
             <Gameboard width={this.state.width} height={this.state.height} 
                 squares={this.state.squares} clickSquare={this.clickSquare}/>
         </div>
@@ -101,8 +101,29 @@ class Game extends Component {
         }
         return clueGrid;
     }
-    generateSideClues(squares){
-
+    
+    generateSideClues(squares, gridWidth, gridHeight, cluesWidth){
+        var squareGridSize = gridWidth * gridHeight;
+        var cluesSize = gridHeight * cluesWidth;
+        var clueGrid = Array(cluesSize).fill(null);
+        for(var rowNum = 0;rowNum < gridHeight;rowNum++){
+            var rowClues = [];
+            var counting = 0;
+            var startPos = rowNum * gridWidth;
+            for(var i = startPos;i<startPos + gridWidth;i++){
+                var square = squares[i].filled;
+                if(square == true){ counting++;}
+                if(square != true && counting > 0){ rowClues.push(counting); counting = 0;}
+            }
+            if(counting > 0){ rowClues.push(counting);}
+            var blankFillerCount = cluesWidth - rowClues.length;
+            for(var i = 0;i<rowClues.length;i++){
+                var clueCount = i + blankFillerCount;
+                var clueGridPos = (rowNum * cluesWidth) + clueCount
+                clueGrid[clueGridPos] = rowClues[i];
+            }
+        }
+        return clueGrid;
     }
 
     generateGrid(width=3,height=3){
