@@ -51,14 +51,18 @@ class Game extends Component {
             console.log(prop);
         }
         var squares = this.state.squares.slice();
-        squares[i].selected = !squares[i].selected;
+        if(squares[i].selected == null){squares[i].selected = "markTrue";}
+        else if(squares[i].selected === "markTrue"){ squares[i].selected = "markFalse";}
+        else if(squares[i].selected === "markFalse"){ squares[i].selected = null;}
+        //squares[i].selected = !squares[i].selected;
         this.setState({squares: squares});
     }
     checkComplete(event){
         var wrongsquare = false;
         for(var i = 0;i< this.state.squares.length;i++){
             var tempSquare = this.state.squares[i];
-            if(tempSquare.filled != tempSquare.selected){
+            if((tempSquare.filled == true && tempSquare.selected != "markTrue") ||
+                (tempSquare.filled == false && tempSquare.selected == "markTrue")){
                 wrongsquare = true;
                 break;
             }
@@ -160,7 +164,7 @@ class Game extends Component {
     createSquareData(id, filled = false){
         return {
             id: id,
-            selected: false,
+            selected: null,
             filled: filled
         }
     }
@@ -227,8 +231,9 @@ const Row = function(props){
 }
 
 const Square = function(props){
-    var visClass = props.square.selected ? "selected":"unselected";
-    if(!props.square.selected && props.square.filled){visClass = "filled";}
+    //var visClass = props.square.selected ? "selected":"unselected";
+    var visClass = props.square.selected;
+    if(props.square.selected === null && props.square.filled){visClass = "filled";}
     var classes = 'Square '+visClass;
     return <button key={props.id} className={classes}
             onClick={()=>props.clickSquare(props.id)}></button>;

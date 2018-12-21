@@ -10,8 +10,11 @@
 }
 .Square:focus{outline: 0}
 
-.selected{
+.selected, .markTrue{
     background-color:black;
+}
+.markFalse{
+    background-color:lightcoral;
 }
 .unselected{
     background-color:white;
