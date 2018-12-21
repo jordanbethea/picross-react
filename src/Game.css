@@ -15,6 +15,7 @@
 }
 .markFalse{
     background-color:lightcoral;
+    background-image: url("./markBlank.svg");
 }
 .unselected{
     background-color:white;

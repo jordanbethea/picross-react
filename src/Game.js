@@ -233,7 +233,7 @@ const Row = function(props){
 const Square = function(props){
     //var visClass = props.square.selected ? "selected":"unselected";
     var visClass = props.square.selected;
-    if(props.square.selected === null && props.square.filled){visClass = "filled";}
+    //if(props.square.selected === null && props.square.filled){visClass = "filled";}
     var classes = 'Square '+visClass;
     return <button key={props.id} className={classes}
             onClick={()=>props.clickSquare(props.id)}></button>;
