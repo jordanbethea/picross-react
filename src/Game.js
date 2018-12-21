@@ -9,6 +9,8 @@ class Game extends Component {
         this.widthInput = this.widthInput.bind(this);
         this.heightInput = this.heightInput.bind(this);
         this.clickSquare = this.clickSquare.bind(this);
+        this.checkComplete = this.checkComplete.bind(this);
+
         var squares = this.generateGrid(3,3);
         this.state = {
             width:3,
@@ -19,7 +21,8 @@ class Game extends Component {
             maxColumnClues:2, //max number of clues per column
             maxRowClues:2, //max number of clues per row,
             topClues:this.generateTopClues(squares, 3, 3, 2),
-            sideClues:this.generateSideClues(squares,3,3, 2)
+            sideClues:this.generateSideClues(squares,3,3, 2),
+            gameComplete:false
         }
     }
     newGame(event){
@@ -35,12 +38,14 @@ class Game extends Component {
             maxColumnClues: maxColClues,
             maxRowClues: maxRowClues,
             topClues: this.generateTopClues(squares, this.state.formWidth, this.state.formHeight, maxColClues),
-            sideClues: this.generateSideClues(squares, this.state.formWidth, this.state.formHeight, maxRowClues)
+            sideClues: this.generateSideClues(squares, this.state.formWidth, this.state.formHeight, maxRowClues),
+            gameComplete:false
         })
     }
     widthInput(event){this.setState({formWidth:parseInt(event.target.value)})}
     heightInput(event){this.setState({formHeight:parseInt(event.target.value)})}
     clickSquare(i){
+        if(this.state.gameComplete){ return; }
         var localState = this.state;
         for(var prop in this){
             console.log(prop);
@@ -48,6 +53,19 @@ class Game extends Component {
         var squares = this.state.squares.slice();
         squares[i].selected = !squares[i].selected;
         this.setState({squares: squares});
+    }
+    checkComplete(event){
+        var wrongsquare = false;
+        for(var i = 0;i< this.state.squares.length;i++){
+            var tempSquare = this.state.squares[i];
+            if(tempSquare.filled != tempSquare.selected){
+                wrongsquare = true;
+                break;
+            }
+        }
+        if(!wrongsquare){
+            this.setState({gameComplete:true});
+        }
     }
 
     render(){
@@ -68,6 +86,9 @@ class Game extends Component {
                 gridPos="sideGrid" clueVals={this.state.sideClues} />
             <Gameboard width={this.state.width} height={this.state.height} 
                 squares={this.state.squares} clickSquare={this.clickSquare}/>
+                <br/>
+            <button onClick={this.checkComplete}>Check Completion</button>
+            <span className={this.state.gameComplete ? "complete":"incomplete"}>Game Completed!!</span>
         </div>
     }
 
@@ -143,7 +164,7 @@ class Game extends Component {
             filled: filled
         }
     }
-}
+}//end of game component
 
 /*
     Components for top and side clues

@@ -52,3 +52,10 @@
     width:20px;
     height:50px;
 }
+
+.incomplete{
+    visibility:hidden;
+}
+.complete{
+    visibility:block;
+}
